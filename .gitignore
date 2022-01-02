@@ -1,3 +1,6 @@
+/venv
+*.egg-info
+
 # files that will not be added to the git
 arxiv
 coverletter.*
