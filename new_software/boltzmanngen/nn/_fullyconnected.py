@@ -18,15 +18,16 @@ class FullyConnected(BaseModule, nn.Module):
     ):
         super().__init__()
         self.in_field = in_field
-        out_field = out_field if out_field is not None else in_field
-        self.out_field = out_field
+        self.out_field = out_field if out_field is not None else in_field
         if irreps_out is None:
-            irreps_out = irreps_in[in_field]
+            irreps_out = {
+                out_field: irreps_in[in_field]
+            }
 
         self._init_irreps(
             irreps_in=irreps_in,
             required_irreps_in=[in_field],
-            irreps_out={out_field: irreps_out},
+            irreps_out=irreps_out,
         )
 
         modules = [

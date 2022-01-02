@@ -55,7 +55,6 @@ class BaseModule:
         self.irreps_out = new_out
 
 
-
 class SequentialNetwork(BaseModule, Sequential):
     def __init__(
         self,
@@ -81,9 +80,9 @@ class SequentialNetwork(BaseModule, Sequential):
             modules = OrderedDict((f"module_{i}", m) for i, m in enumerate(module_list))
         super().__init__(modules)
     
-    def forward(self, input: DataConfig.Type) -> DataConfig.Type:
-        for module in self:
-            input = module(input)
+    def forward(self, input: DataConfig.Type, inverse: bool = False) -> DataConfig.Type:
+        for module in reversed(self) if inverse else self:
+            input = module(input, inverse)
         return input
     
     @classmethod
