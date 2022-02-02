@@ -1,4 +1,5 @@
 from typing import Any, Dict, Optional
+import torch
 import torch.nn as nn
 
 from boltzmanngen.nn._sequential import BaseModule
@@ -42,5 +43,5 @@ class FullyConnected(BaseModule, nn.Module):
         self._fc = nn.Sequential(*modules)
 
     def forward(self, data: DataConfig.Type) -> DataConfig.Type:
-        data[self.out_field] = self._fc(data[self.in_field])
+        data[self.out_field] = torch.tanh(self._fc(data[self.in_field]))
         return data

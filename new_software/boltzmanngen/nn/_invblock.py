@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 import torch.nn as nn
+import torch
 
 from boltzmanngen.nn._sequential import BaseModule
 from boltzmanngen.data import DataConfig
@@ -65,6 +66,6 @@ class InvertibleBlock(BaseModule, nn.Module):
 
     def resize_data(self, data, inverse):
         data = self._resize(data)
-        resize = 1/data[self.transform_out_field] if inverse else data[self.transform_out_field]
-        data[self.out_field] = data[self.in_field] * resize
+        resize = -data[self.transform_out_field] if inverse else data[self.transform_out_field]
+        data[self.out_field] = data[self.in_field] * torch.exp(resize)
         return data

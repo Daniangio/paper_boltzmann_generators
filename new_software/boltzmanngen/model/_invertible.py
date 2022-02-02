@@ -4,19 +4,20 @@ from e3nn.o3 import Irreps
 
 from boltzmanngen.nn._sequential import SequentialNetwork
 from boltzmanngen.nn._invblock import InvertibleBlock
+from boltzmanngen.nn._encode_io import IOEncoding
 
 
 def InvertibleModel(config) -> SequentialNetwork:
     logging.debug("Start building the network model")
 
     num_layers = config.get("num_layers", 3)
+    input_dim = config.get("input_dim", 2)
     irreps_in={
-        DataConfig.FIRST_CHANNEL_KEY: Irreps([(4, (0, 1))]),
-        DataConfig.SECOND_CHANNEL_KEY: Irreps([(4, (0, 1))])
+        DataConfig.INPUT_KEY: Irreps([(input_dim, (0, 1))]),
     }
 
     layers = {
-
+        "encode_input": IOEncoding
     }
 
     # insertion preserves order
@@ -27,6 +28,17 @@ def InvertibleModel(config) -> SequentialNetwork:
                 "parity": layer_i%2
             }
         )
+    
+    layers.update(
+        {
+            "encode_output": (
+            IOEncoding,
+            {
+                "initial": False
+            }
+        )
+        }
+    )
 
     return SequentialNetwork.from_parameters(
         shared_params=config,

@@ -23,6 +23,7 @@ setup(
         "wandb",
         "biopandas",
         "torch@https://download.pytorch.org/whl/cu111/torch-1.9.1%2Bcu111-cp38-cp38-linux_x86_64.whl",
+        "torch-runstats>=0.2.0",
         "e3nn>=0.3.5,<0.5.0",
         "pyyaml",
         "contextlib2;python_version<'3.7'",  # backport of nullcontext

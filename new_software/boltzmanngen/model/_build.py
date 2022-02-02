@@ -6,7 +6,7 @@ from boltzmanngen.nn._sequential import BaseModule
 def model_from_config(
     config,
 ) -> BaseModule:
-    """Build a model based on `config`.
+    """ Build a model based on `config`.
 
     Args:
         config: Configuration file
