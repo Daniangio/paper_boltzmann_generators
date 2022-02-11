@@ -22,7 +22,7 @@ setup(
         "tqdm",
         "wandb",
         "biopandas",
-        "torch@https://download.pytorch.org/whl/cu111/torch-1.9.1%2Bcu111-cp38-cp38-linux_x86_64.whl",
+        "torch@https://download.pytorch.org/whl/cu113/torch-1.10.2%2Bcu113-cp39-cp39-linux_x86_64.whl",
         "torch-runstats>=0.2.0",
         "e3nn>=0.3.5,<0.5.0",
         "pyyaml",

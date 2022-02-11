@@ -1,11 +1,4 @@
-"""
-original project = "bgflow" https://github.com/noegroup/bgflow
-copyright = MIT License
-author = Jonas Köhler, Andreas Krämer, Manuel Dibak, Leon Klein, Frank Noé
-"""
-
 import torch
-
 from .base import Energy
 
 
@@ -24,7 +17,7 @@ class MultimodalEnergy(Energy):
         X1 = x[:, [0]]
         X2 = x[:, 1:]
         hessian = torch.zeros((len(X1), self.dim, self.dim), dtype=torch.float32).to(x.device)
-        hessian[:, 0, 0] = 12 * X1.pow(2) + 4 * X2 - 42
+        hessian[:, 0, 0] = (12 * X1.pow(2) + 4 * X2 - 42).view(-1)
         hessian[:, 0, 1] = (4 * (X1 + X2)).view(-1)
         hessian[:, 1, 0] = (4 * (X1 + X2)).view(-1)
         hessian[:, 1, 1] = (12 * X2.pow(2) + 4 * X1 - 26).view(-1)

@@ -19,6 +19,7 @@ class GaussianMCMCSampler(Energy, Sampler):
         noise_std=.1,
         n_stride=1,
         n_burnin=0,
+        uniform_range=[0, 1],
         box_constraint=None
     ):
         super().__init__(energy.dim)
@@ -28,6 +29,7 @@ class GaussianMCMCSampler(Energy, Sampler):
         self._noise_std = noise_std
         self._n_stride = n_stride
         self._n_burnin = n_burnin
+        self.uniform_range = uniform_range
         self._box_constraint = box_constraint
         
         self._reset(init_state)
@@ -37,7 +39,7 @@ class GaussianMCMCSampler(Energy, Sampler):
         x_prop = self._x_curr + noise
         e_prop = self._energy_function.energy(x_prop, temperature=self._temperature).view(-1, 1)
         e_diff = e_prop - self._e_curr
-        r = -torch.Tensor(x_prop.shape[0]).uniform_(0, 1).log().view(-1, 1)
+        r = -torch.Tensor(x_prop.shape[0]).uniform_(*self.uniform_range).log().view(-1, 1)
         acc = (r > e_diff).float().view(-1, 1)
         rej = 1. - acc
         self._x_curr = rej * self._x_curr + acc * x_prop

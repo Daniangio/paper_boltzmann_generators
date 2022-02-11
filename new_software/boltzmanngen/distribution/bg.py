@@ -1,8 +1,8 @@
-from typing import Union
+from typing import Optional, Union
 from boltzmanngen.data import DataConfig
 from boltzmanngen.train.loss import Loss
 import torch
-
+import numpy as np
 from boltzmanngen.distribution import Energy, Sampler
 from boltzmanngen.nn._sequential import BaseModule
 
@@ -95,6 +95,29 @@ class BoltzmannGenerator(Energy, Sampler):
         }
         data = self._model(data)
         loss, loss_contrib = self._loss(pred=data, temperature=temperature, direction=DataConfig.Z_TO_X_KEY, explore=explore)
+        self._latest_loss_contrib = loss_contrib
+        return loss
+    
+    def path(self, n_samples: int, temperature: float = 1.0, path_weight: float = 1.0, x: Optional[torch.Tensor] = None):
+        if x is None:
+            z = self._prior.sample(2, temperature=temperature)
+        else:
+            data = {
+                DataConfig.INPUT_KEY: x.to(self._device)
+            }
+            data = self._model(data, inverse=True)
+            z = data[DataConfig.OUTPUT_KEY]
+        assert z.size()[0] == 2
+        z_dim = z.size()[1]
+        z_interpolated = torch.zeros((n_samples, z_dim), dtype=torch.torch.get_default_dtype()).to(z.device)
+        for i in range(z_dim):
+            z_interpolated[:, i] = torch.linspace(z[0, i].item(), z[1, i].item(), n_samples)
+        
+        data = {
+                DataConfig.INPUT_KEY: z_interpolated.to(self._device)
+            }
+        data = self._model(data)
+        loss, loss_contrib = self._loss(pred=data, temperature=temperature, direction=DataConfig.PATH_KEY, bins=int(np.sqrt(n_samples)), path_weight=path_weight)
         self._latest_loss_contrib = loss_contrib
         return loss
     
