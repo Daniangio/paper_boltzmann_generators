@@ -1,5 +1,7 @@
 /venv
 *.egg-info
+*.pth
+*.txt
 
 # files that will not be added to the git
 arxiv

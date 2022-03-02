@@ -88,7 +88,7 @@ class PathLoss:
         self,
         energy_model: str,
         params: Dict = {},
-        sigma: float = 1.0,
+        sigmas: List[float] = [1.0, 1.0],
         normalize: bool = True,
         window_size: int = 10,
         logp_eps: List[float] = [1e-2, 1e-2],
@@ -96,7 +96,7 @@ class PathLoss:
     ):
         builder = load_callable(energy_model, module_name="boltzmanngen.distribution")
         self.energy_model = builder(**params)
-        self.sigma = sigma
+        self.sigmas = sigmas
         self.normalize = normalize
         self.E_stats = RunningStats(window_size=window_size)
         self.logp_stats = RunningStats(window_size=window_size)
@@ -121,14 +121,14 @@ class PathLoss:
         x_end = pred[key][-1]
         R = x_end - x_start
         centered_x = pred[key] - x_start
-        gausshist  = GaussianHistogram(bins=bins, min=0.0-self.hist_volume_expansions[0], max=1.0+self.hist_volume_expansions[0], sigma=1e-3).to(x_start.device)
+        gausshist  = GaussianHistogram(bins=bins, min=0.0-self.hist_volume_expansions[0], max=1.0+self.hist_volume_expansions[0], sigma=self.sigmas[0]).to(x_start.device)
         path_positions = torch.matmul(centered_x, R).div((R).pow(2).sum(0) + 1e-10)
         probs = gausshist(path_positions)
         logp = -torch.log(self.logp_eps[0] + probs)
 
         R_orth = R.clone()
         R_orth[0], R_orth[1] = -R[1], R[0]
-        gausshist_orth  = GaussianHistogram(bins=bins, min=-0.5-self.hist_volume_expansions[1], max=0.5+self.hist_volume_expansions[1], sigma=1e-1).to(x_start.device)
+        gausshist_orth  = GaussianHistogram(bins=bins, min=-0.5-self.hist_volume_expansions[1], max=0.5+self.hist_volume_expansions[1], sigma=self.sigmas[1]).to(x_start.device)
         path_positions_orth = torch.matmul(centered_x, R_orth).div((R_orth).pow(2).sum(0) + 1e-10)
         probs_orth = gausshist_orth(path_positions_orth)
         logp_orth = -torch.log(self.logp_eps[1] + probs_orth)

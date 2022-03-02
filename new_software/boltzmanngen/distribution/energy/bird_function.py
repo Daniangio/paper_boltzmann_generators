@@ -2,14 +2,14 @@ import torch
 from .base import Energy
 
 
-class HoldersEnergy(Energy):
+class BirdEnergy(Energy):
     def __init__(self, dim):
         super().__init__(dim)
 
     def _energy(self, x, **kwargs):
         X1 = x[:, [0]]
         X2 = x[:, 1:]
-        energy = -torch.abs(torch.sin(X1) * torch.cos(X2) * torch.exp(torch.abs(1 - torch.sqrt(X1.pow(2) + X2.pow(2))/torch.pi))) + 0.01* (X1**4 + X2**4)
+        energy = torch.sin(X1)*(torch.exp(1-torch.cos(X2))**2)+torch.cos(X2)*(torch.exp(1-torch.sin(X1))**2)+(X1-X2)**2
         return (energy).view(-1)
     
     # def _hessian(self, x: torch.Tensor):
